@@ -6,12 +6,10 @@ f.close()
 
 traces = []
 gates = set()
-cars = []
 for line in data:
     args = line.split(";")
     gates.add(args[3])
     traces.append(args)
-    # cars.append(args[1], args[2])
 gates = sorted(gates)
 
 groupedTraces = {}
