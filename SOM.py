@@ -274,7 +274,7 @@ class SOM(object):
                 c = colors[targets[cnt]]
             w = self.winner(xx)
             ax.plot(w[1] + .5 + 0.1 * np.random.randn(1), w[0] + .5 + 0.1 * np.random.randn(1),
-                    markers[targets[cnt]], color=c, markersize=12)
+                    markers[targets[cnt]], color=c, markersize=10)
 
         ax.set_aspect('equal')
         ax.set_xlim([0, self.x])
@@ -302,7 +302,75 @@ class SOM(object):
             plt.close()
             print("Point map plot done!")
         else:
-            plt.show()
+            fig = plt.gcf()
+            return fig
+
+    def plot_point_map_gui(self, data, targets, targetnames, filename=None, colors=None, markers=None, example_dict=None,
+                       density=True, activities=None):
+        """ Visualize the som with all data as points around the neurons
+
+        :param data: {numpy.ndarray} data to visualize with the SOM
+        :param targets: {list/array} array of target classes (0 to len(targetnames)) corresponding to data
+        :param targetnames: {list/array} names describing the target classes given in targets
+        :param filename: {str} optional, if given, the plot is saved to this location
+        :param colors: {list/array} optional, if given, different classes are colored in these colors
+        :param markers: {list/array} optional, if given, different classes are visualized with these markers
+        :param example_dict: {dict} dictionary containing names of examples as keys and corresponding descriptor values
+            as values. These examples will be mapped onto the density map and marked
+        :param density: {bool} whether to plot the density map with winner neuron counts in the background
+        :param activities: {list/array} list of activities (e.g. IC50 values) to use for coloring the points
+            accordingly; high values will appear in blue, low values in green
+        :return: plot shown or saved if a filename is given
+        """
+        if not markers:
+            markers = ['o'] * len(targetnames)
+        if not colors:
+            colors = ['#EDB233', '#90C3EC', '#C02942', '#79BD9A', '#774F38', 'gray', 'black']
+        if activities:
+            heatmap = plt.get_cmap('coolwarm').reversed()
+            colors = [heatmap(a / max(activities)) for a in activities]
+        if density:
+            fig, ax = self.plot_density_map(data, internal=True)
+        else:
+            fig, ax = plt.subplots(figsize=self.shape)
+
+        for cnt, xx in enumerate(data):
+            if activities:
+                c = colors[cnt]
+            else:
+                c = colors[targets[cnt]]
+            w = self.winner(xx)
+            ax.plot(w[1] + .5 + 0.1 * np.random.randn(1), w[0] + .5 + 0.1 * np.random.randn(1),
+                    markers[targets[cnt]], color=c, markersize=3)
+
+        ax.set_aspect('equal')
+        ax.set_xlim([0, self.x])
+        ax.set_ylim([0, self.y])
+        plt.xticks(np.arange(.5, self.x + .5), range(self.x))
+        plt.yticks(np.arange(.5, self.y + .5), range(self.y))
+        ax.grid(which='both')
+
+        if not activities:
+            patches = [mptchs.Patch(color=colors[i], label=targetnames[i]) for i in range(len(targetnames))]
+            legend = plt.legend(handles=patches, bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=len(targetnames),
+                                mode="expand", borderaxespad=0.1)
+            legend.get_frame().set_facecolor('#e5e5e5')
+
+        if example_dict:
+            for k, v in example_dict.items():
+                w = self.winner(v)
+                x = w[1] + 0.5 + np.random.normal(0, 0.15)
+                y = w[0] + 0.5 + np.random.normal(0, 0.15)
+                plt.plot(x, y, marker='*', color='#FDBC1C', markersize=5)
+                plt.annotate(k, xy=(x + 0.5, y - 0.18), textcoords='data', fontsize=18, fontweight='bold')
+
+        if filename:
+            plt.savefig(filename)
+            plt.close()
+            print("Point map plot done!")
+        else:
+            fig = plt.gcf()
+            return fig
 
     def plot_density_map(self, data, colormap='Oranges', filename=None, example_dict=None, internal=False):
         """ Visualize the data density in different areas of the SOM.
@@ -341,6 +409,48 @@ class SOM(object):
         else:
             return fig, ax
 
+    def plot_class_density_gui(self, data, targets, t=1, name='actives', colormap='Oranges', example_dict=None,
+                           filename=None):
+        """ Plot a density map only for the given class
+
+        :param data: {numpy.ndarray} data to visualize the SOM density (number of times a neuron was winner)
+        :param targets: {list/array} array of target classes (0 to len(targetnames)) corresponding to data
+        :param t: {int} target class to plot the density map for
+        :param name: {str} target name corresponding to target given in t
+        :param colormap: {str} colormap to use, select from matplolib sequential colormaps
+        :param example_dict: {dict} dictionary containing names of examples as keys and corresponding descriptor values
+            as values. These examples will be mapped onto the density map and marked
+        :param filename: {str} optional, if given, the plot is saved to this location
+        :return: plot shown or saved if a filename is given
+        """
+        targets = np.array(targets)
+        t_data = data[np.where(targets == t)[0]]
+        wm = self.winner_map(t_data)
+        fig, ax = plt.subplots(figsize=self.shape)
+        plt.pcolormesh(wm, cmap=colormap, edgecolors=None)
+        plt.colorbar()
+        plt.xticks(np.arange(.5, self.x + .5), range(self.x))
+        plt.yticks(np.arange(.5, self.y + .5), range(self.y))
+        plt.title(name, fontweight='bold', fontsize=20)
+        ax.set_aspect('equal')
+        plt.text(0.1, -3., "%i Datapoints" % len(t_data), fontsize=12, fontweight='bold')
+
+        if example_dict:
+            for k, v in example_dict.items():
+                w = self.winner(v)
+                x = w[1] + 0.5 + np.random.normal(0, 0.15)
+                y = w[0] + 0.5 + np.random.normal(0, 0.15)
+                plt.plot(x, y, marker='*', color='#FDBC1C', markersize=24)
+                plt.annotate(k, xy=(x + 0.5, y - 0.18), textcoords='data', fontsize=18, fontweight='bold')
+
+        if filename:
+            plt.savefig(filename)
+            plt.close()
+            print("Class density plot done!")
+        else:
+            fig = plt.gcf()
+            return fig
+
     def plot_class_density(self, data, targets, t=1, name='actives', colormap='Oranges', example_dict=None,
                            filename=None):
         """ Plot a density map only for the given class
@@ -365,7 +475,7 @@ class SOM(object):
         plt.yticks(np.arange(.5, self.y + .5), range(self.y))
         plt.title(name, fontweight='bold', fontsize=28)
         ax.set_aspect('equal')
-        plt.text(0.1, -1., "%i Datapoints" % len(t_data), fontsize=20, fontweight='bold')
+        plt.text(0.1, -1., "%i Datapoints" % len(t_data), fontsize=28, fontweight='bold')
 
         if example_dict:
             for k, v in example_dict.items():
@@ -373,14 +483,15 @@ class SOM(object):
                 x = w[1] + 0.5 + np.random.normal(0, 0.15)
                 y = w[0] + 0.5 + np.random.normal(0, 0.15)
                 plt.plot(x, y, marker='*', color='#FDBC1C', markersize=24)
-                plt.annotate(k, xy=(x + 0.5, y - 0.18), textcoords='data', fontsize=18, fontweight='bold')
+                plt.annotate(k, xy=(x + 0.5, y - 0.18), textcoords='data', fontsize=20, fontweight='bold')
 
         if filename:
             plt.savefig(filename)
             plt.close()
             print("Class density plot done!")
         else:
-            plt.show()
+            fig = plt.gcf()
+            return fig
 
     def plot_distance_map(self, colormap='Oranges', filename=None):
         """ Plot the distance map after training.

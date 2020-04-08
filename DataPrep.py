@@ -6,13 +6,13 @@ f.close()
 
 traces = []
 gates = set()
+cars = []
 for line in data:
     args = line.split(";")
     gates.add(args[3])
     traces.append(args)
+    # cars.append(args[1], args[2])
 gates = sorted(gates)
-
-print(gates)
 
 groupedTraces = {}
 for t in traces:
@@ -20,6 +20,19 @@ for t in traces:
         groupedTraces[t[1]].append(t)
     else:
         groupedTraces[t[1]] = [t]
+
+target = []
+for x in groupedTraces:
+    target.append(groupedTraces[x][1][2])
+f = open("target.txt", "w+")
+for rec in target:
+    if rec == '2P':
+        f.write('7')
+        f.write("\n")
+    else:
+        f.write(str(rec))
+        f.write("\n")
+f.close()
 
 vectors = []
 f = open("output.txt", "w+")
