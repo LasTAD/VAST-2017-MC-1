@@ -92,7 +92,7 @@ class SOM(object):
               (self.epoch, w[0], w[1], self.sigmas[self.epoch], self.alphas[self.epoch]))
         self.epoch = self.epoch + 1
 
-    def fit(self, data, epochs=0, save_e=False, interval=1000, decay='hill'):
+    def fit(self, data, epochs=0, save_e=False, interval=10000, decay='hill'):
         """ Train the SOM on the given data for several iterations
 
         :param data: {numpy.ndarray} data to train on
@@ -274,7 +274,7 @@ class SOM(object):
                 c = colors[targets[cnt]]
             w = self.winner(xx)
             ax.plot(w[1] + .5 + 0.1 * np.random.randn(1), w[0] + .5 + 0.1 * np.random.randn(1),
-                    markers[targets[cnt]], color=c, markersize=10)
+                    markers[targets[cnt]], color=c, markersize=5)
 
         ax.set_aspect('equal')
         ax.set_xlim([0, self.x])
@@ -341,7 +341,7 @@ class SOM(object):
                 c = colors[targets[cnt]]
             w = self.winner(xx)
             ax.plot(w[1] + .5 + 0.1 * np.random.randn(1), w[0] + .5 + 0.1 * np.random.randn(1),
-                    markers[targets[cnt]], color=c, markersize=3)
+                    markers[targets[cnt]], color=c, markersize=1)
 
         ax.set_aspect('equal')
         ax.set_xlim([0, self.x])
