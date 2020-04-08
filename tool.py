@@ -16,7 +16,7 @@ layout = [[sg.Text('SOM для VAST 2017 MC1', font='Any 18')],
 
 # create the form and show it without the plot
 window = sg.Window('Аналитический инструмент для SOM',
-                   layout, finalize=True)
+                   layout, finalize=True, size=(320,170))
 
 
 def draw_figure(canvas, figure, loc=(0, 0)):
