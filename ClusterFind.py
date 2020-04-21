@@ -1,11 +1,14 @@
 import numpy as np
 from SOM import SOM
-import DataPrep as dp
+import sompy
+import susi
+
 
 data = np.loadtxt('output.txt', delimiter=';', usecols=range(40))
 
+###SOM
 som = SOM(20, 20)  # initialize the SOM
-som.fit(data, 10000, decay='linear')
+som.fit(data, 10000, decay='hill')
 # som.plot_error_history(filename='images/som_error.png')  # plot the training error history
 
 targets = np.loadtxt('target.txt', dtype='int')
@@ -22,5 +25,7 @@ names = ['Автомобиль',
          ]
 # now visualize the learned representation with the class labels
 som.plot_point_map(data, targets, names, filename='images/som.png')
-# som.plot_class_density(data, targets, t=0, name='Vehicles', filename='images/density.png')
+
+for name in names:
+    som.plot_class_density(data, targets, t=names.index(name), name=name, filename='images/density ' + name + '.png')
 # som.plot_distance_map(filename='images/distance_map.png')  # plot the distance map after training

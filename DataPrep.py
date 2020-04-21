@@ -1,4 +1,6 @@
 import numpy as np
+import sompy
+
 
 f = open("Lekagul Sensor Data.csv", "r")
 data = f.readlines()

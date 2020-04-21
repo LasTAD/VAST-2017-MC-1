@@ -92,7 +92,7 @@ class SOM(object):
               (self.epoch, w[0], w[1], self.sigmas[self.epoch], self.alphas[self.epoch]))
         self.epoch = self.epoch + 1
 
-    def fit(self, data, epochs=0, save_e=False, interval=10000, decay='hill'):
+    def fit(self, data, epochs=0, save_e=False, interval=10000, decay='hill', init_type='pca'):
         """ Train the SOM on the given data for several iterations
 
         :param data: {numpy.ndarray} data to train on
@@ -104,7 +104,7 @@ class SOM(object):
         """
         self.interval = interval
         if not self.inizialized:
-            self.initialize(data)
+            self.initialize(data, init_type)
         if not epochs:
             epochs = len(data)
             indx = np.random.choice(np.arange(len(data)), epochs, replace=False)
@@ -274,7 +274,7 @@ class SOM(object):
                 c = colors[targets[cnt]]
             w = self.winner(xx)
             ax.plot(w[1] + .5 + 0.1 * np.random.randn(1), w[0] + .5 + 0.1 * np.random.randn(1),
-                    markers[targets[cnt]], color=c, markersize=5)
+                    markers[targets[cnt]], color=c, markersize=3)
 
         ax.set_aspect('equal')
         ax.set_xlim([0, self.x])
@@ -557,3 +557,6 @@ class SOM(object):
         tmp_dict = pickle.load(f)
         f.close()
         self.__dict__.update(tmp_dict)
+
+
+

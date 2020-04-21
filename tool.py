@@ -11,12 +11,14 @@ layout = [[sg.Text('SOM для VAST 2017 MC1', font='Any 18')],
           [sg.Text('Количество эпох'), sg.InputText(10000, key='-epochs-', size=(6, 1))],
           [sg.Text('Тип "Decay"'), sg.Radio('hill', 'DECAY', True, key='hill'),
            sg.Radio('linear', 'DECAY', key='linear')],
+          [sg.Text('Тип инициализации'), sg.Radio('PCA', 'init', True, key='pca'),
+           sg.Radio('Случайно', 'init', key='random')],
           [sg.Button('Начать расчет', key='-start-'), sg.Button('Выход', key="Exit")]
           ]
 
 # create the form and show it without the plot
 window = sg.Window('Аналитический инструмент для SOM',
-                   layout, finalize=True, size=(320,170))
+                   layout, finalize=True, size=(320, 170))
 
 
 def draw_figure(canvas, figure, loc=(0, 0)):
@@ -33,9 +35,15 @@ while True:
 
         som = SOM(int(values['-width-']), int(values['-height-']))  # initialize the SOM
         if values['hill']:
-            som.fit(data, int(values['-epochs-']), decay='hill')
+            if values['random']:
+                som.fit(data, int(values['-epochs-']), decay='hill', init_type='random')
+            else:
+                som.fit(data, int(values['-epochs-']), decay='hill')
         if values['linear']:
-            som.fit(data, int(values['-epochs-']), decay='linear')
+            if values['random']:
+                som.fit(data, int(values['-epochs-']), decay='linear', init_type='random')
+            else:
+                som.fit(data, int(values['-epochs-']), decay='linear')
 
         targets = np.loadtxt('target.txt', dtype='int')
         targets = targets - 1
