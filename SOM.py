@@ -488,7 +488,7 @@ class SOM(object):
         if filename:
             plt.savefig(filename)
             plt.close()
-            print("Class density plot done!")
+            print("Class " + str(t) + " density plot done!")
         else:
             fig = plt.gcf()
             return fig
@@ -546,6 +546,7 @@ class SOM(object):
         f = open(filename, 'wb')
         pickle.dump(self.__dict__, f, 2)
         f.close()
+        print('SOM saved!')
 
     def load(self, filename):
         """ Save the SOM instance to a pickle file.
@@ -556,6 +557,7 @@ class SOM(object):
         f = open(filename, 'rb')
         tmp_dict = pickle.load(f)
         f.close()
+        print('SOM loaded!')
         self.__dict__.update(tmp_dict)
 
 

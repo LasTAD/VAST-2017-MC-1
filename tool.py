@@ -78,7 +78,7 @@ while True:
                 window2.close()
                 break
             if event2 == '-print-':
-                som.plot_point_map(data, targets, names, filename='images/som.png')
+                som.plot_point_map(data, targets, names, filename='images/SOM/som.png')
                 # som.plot_class_density(data, targets, t=0, name='Vehicles', filename='images/density.png')
 
     if event == 'Exit':
