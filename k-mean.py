@@ -11,14 +11,19 @@ cur.execute('select car_id from dataset')
 cars = cur.fetchall()
 
 data = np.loadtxt('Data/output.txt', delimiter=';', usecols=range(40))
-k = 10
+k = 25
 kmeans = KMeans(n_clusters=k, random_state=0).fit(data)
 labels = kmeans.labels_
 f = open("Data/target_k-means.txt", "w+")
+cur.execute('delete from k_mean')
+conn.commit()
 for cnt, xx in enumerate(labels):
-    f.write(str(xx) + ';' + cars[cnt][0])
+    f.write(str(xx))
     f.write("\n")
+    cur.execute("insert into k_mean (cluster, car_id) values (?, ?);", (str(xx), cars[cnt][0],))
 f.close()
+conn.commit()
+print('k-mean')
 
 poi_coords = np.loadtxt('Data/gates-map.txt', delimiter=';', usecols=(1, 2))
 
