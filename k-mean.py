@@ -12,7 +12,7 @@ cars = cur.fetchall()
 
 data = np.loadtxt('Data/output.txt', delimiter=';', usecols=range(40))
 k = 25
-kmeans = KMeans(n_clusters=k, random_state=0).fit(data)
+kmeans = KMeans(n_clusters=k, random_state=0, ).fit(data)
 labels = kmeans.labels_
 f = open("Data/target_k-means.txt", "w+")
 cur.execute('delete from k_mean')

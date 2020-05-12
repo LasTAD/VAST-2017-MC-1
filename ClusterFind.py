@@ -2,13 +2,13 @@ import numpy as np
 from SOM import SOM
 
 
-data = np.loadtxt('output.txt', delimiter=';', usecols=range(40))
+data = np.loadtxt('Data/output.txt', delimiter=';', usecols=range(40))
 
 ###SOM
 som = SOM(20, 20)  # initialize the SOM
 som.fit(data, 10000, decay='hill')
 
-targets = np.loadtxt('target.txt', dtype='int')
+targets = np.loadtxt('Data/target.txt', dtype='int')
 
 targets = targets - 1
 
