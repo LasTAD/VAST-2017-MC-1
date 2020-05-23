@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import matplotlib.cbook as cbook
 import sqlite3
 import seaborn as sb
+from SOM import SOM
+
 
 conn = sqlite3.connect('Data/data.db')
 cur = conn.cursor()
@@ -12,7 +14,8 @@ cars = cur.fetchall()
 
 data = np.loadtxt('Data/output.txt', delimiter=';', usecols=range(40))
 k = 25
-kmeans = KMeans(n_clusters=k, random_state=0, ).fit(data)
+kmeans = KMeans(n_clusters=k).fit(data)
+# kmeans = KMeans(init='k-means++').fit(data)
 labels = kmeans.labels_
 f = open("Data/target_k-means.txt", "w+")
 cur.execute('delete from k_mean')
@@ -23,7 +26,12 @@ for cnt, xx in enumerate(labels):
     cur.execute("insert into k_mean (cluster, car_id) values (?, ?);", (str(xx), cars[cnt][0],))
 f.close()
 conn.commit()
-print('k-mean')
+print('k-mean ready')
+
+cur.execute('select max(cluster) from k_mean')
+clus = cur.fetchone()
+k = int(clus[0]) + 1
+print(k)
 
 poi_coords = np.loadtxt('Data/gates-map.txt', delimiter=';', usecols=(1, 2))
 
@@ -62,6 +70,7 @@ for kl_num in range(k):
     fig.set_figwidth(7)
     fig.set_figheight(7)
     plt.savefig('images/Maps/Кластер ' + str(kl_num) + '.png')
+    print('images/Maps/Кластер ' + str(kl_num) + ' ready')
     # plt.show()
 
 for kl_num in range(k):
@@ -85,4 +94,20 @@ for kl_num in range(k):
     fig.set_figwidth(7)
     fig.set_figheight(7)
     plt.savefig('images/Maps/Кластер ' + str(kl_num) + ' и маршрут.png')
+    print('images/Maps/Кластер ' + str(kl_num) + 'и маршрут ready')
     # plt.show()
+
+    data = np.loadtxt('Data/output.txt', delimiter=';', usecols=range(40))
+    # k = 25
+    targets = np.loadtxt('Data/target_k-means.txt', delimiter=';', usecols=(0), dtype='int')
+    print('K-means ready!')
+
+    som = SOM(20, 20)  # initialize the SOM
+    som.load('Data/SOM')
+    name = 0
+    names = []
+    for x in range(k):
+        names.append(str(name))
+        name += 1
+    colors = sb.color_palette(n_colors=k)
+    som.plot_point_map(data, targets, names, filename='images/SOM/som_test.png', colors=colors)
